@@ -31,7 +31,20 @@ export default function ContactSection({ block }: ContactSectionProps) {
     };
 
     try {
-      const response = await fetch("/api/contact", {
+      // Determine the contact endpoint
+      const customEndpoint = import.meta.env.VITE_CONTACT_ENDPOINT;
+      const endpoint = customEndpoint || "/api/contact";
+
+      // Check if we're on GitHub Pages without a custom endpoint
+      if (!customEndpoint && typeof window !== "undefined" && window.location.hostname.includes("github.io")) {
+        setSubmitState("error");
+        setFeedbackMessage(
+          "Contact form is not available on GitHub Pages. Please configure VITE_CONTACT_ENDPOINT to use a backend service."
+        );
+        return;
+      }
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,7 +52,13 @@ export default function ContactSection({ block }: ContactSectionProps) {
         body: JSON.stringify(payload),
       });
 
-      const result = (await response.json()) as { ok: boolean; error?: string };
+      let result: { ok: boolean; error?: string };
+      try {
+        result = (await response.json()) as { ok: boolean; error?: string };
+      } catch {
+        // Handle non-JSON responses
+        result = { ok: response.ok, error: response.statusText || "Unknown error" };
+      }
 
       if (!response.ok || !result.ok) {
         throw new Error(result.error || block.errorMessage);

@@ -117,8 +117,10 @@ export const Route = createFileRoute("/api/contact")({
           const host = getRequiredEnv("SMTP_HOST");
           const portRaw = getRequiredEnv("SMTP_PORT");
           const user = getRequiredEnv("SMTP_USER");
-          const pass = getRequiredEnv("SMTP_PASS");
-          const contactToEmail = getRequiredEnv("CONTACT_TO_EMAIL");
+          let pass = getRequiredEnv("SMTP_PASS");
+
+          // Normalize Gmail app password formatting (strip spaces/quotes)
+          pass = pass.replace(/[\s"']/g, "");
 
           const port = Number(portRaw);
 
@@ -138,7 +140,7 @@ export const Route = createFileRoute("/api/contact")({
 
           await transporter.sendMail({
             from: `${senderName} Contact <${user}>`,
-            to: contactToEmail,
+            to: parsed.data.email,
             replyTo: parsed.data.email,
             subject: `New portfolio message from ${parsed.data.name}`,
             text: [

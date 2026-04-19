@@ -4,21 +4,17 @@ import { RouterProvider } from "@tanstack/react-router";
 
 import { getRouter } from "./router";
 
-async function startApp() {
-  const router = getRouter();
+const router = getRouter();
 
-  // Load initial route state before first paint in pure SPA static hosting.
-  await router.load();
+const container = document;
 
-  const container = document;
+startTransition(() => {
+  createRoot(container).render(
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>,
+  );
+});
 
-  startTransition(() => {
-    createRoot(container).render(
-      <StrictMode>
-        <RouterProvider router={router} />
-      </StrictMode>,
-    );
-  });
-}
-
-void startApp();
+// Load initial route state non-blocking after first paint
+void router.load();

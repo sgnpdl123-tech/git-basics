@@ -20,22 +20,30 @@ If the app shows a config error table, fix the listed field path in `portfolio.c
 - `contact`: Contact details + contact form
 - `footer`: Social links + copyright
 
-## Contact Form (Google SMTP)
-The contact form posts to `POST /api/contact`.
+## Contact Form (Email Backend)
+The contact form submits to `/api/contact` (or a custom endpoint on GitHub Pages).
 
-Set environment variables before running:
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `CONTACT_TO_EMAIL`
+### For Vercel Deployment
+Set environment variables on Vercel:
+- `SMTP_HOST` (e.g., `smtp.gmail.com`)
+- `SMTP_PORT` (e.g., `465` for SSL or `587` for TLS)
+- `SMTP_USER` (your email address)
+- `SMTP_PASS` (your Gmail App Password)
 
-You can start by copying `.env.example` into your local `.env`.
+Emails are sent to the address submitted in the form.
+
+### For GitHub Pages Deployment
+GitHub Pages is static and cannot run backend code. To enable the contact form on GitHub Pages:
+1. Deploy the backend (Node.js/Vercel) separately
+2. Set the environment variable: `VITE_CONTACT_ENDPOINT=https://your-backend.vercel.app/api/contact`
+3. The frontend will use this endpoint instead of the local `/api/contact`
+
+Without `VITE_CONTACT_ENDPOINT`, the form will show a clear message explaining that contact is not available on GitHub Pages.
 
 Recommended Gmail setup:
 - Use `smtp.gmail.com`
 - Use port `465` (SSL) or `587` (TLS)
-- Use a Gmail App Password, not your normal account password
+- Use a Gmail App Password (generate one from your Google Account security page), not your normal account password
 
 ## Troubleshooting
 | Problem | Likely Cause | Fix |
